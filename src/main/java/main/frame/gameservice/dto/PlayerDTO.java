@@ -23,21 +23,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class PlayerDTO {
     private Long id;
+    private Long userId;
     private int level;
-    private Set<CharacterCard> characterClasses;
-    private int classesLimit;
-    private Set<BaseCard> backpack;
-    private int damage;
-    private int companionLimit;
-    private Set<CompanionCard> companions;
-    private int weaponsLimit;
-    private Set<WeaponCard> weapons;
-    private List<Effect> buffs;
-    private List<Effect> debuffs;
-    private int handLimit = 6;
-    private Set<BaseCard> hand;
-    private Set<Ability> abilities;
-    private HeadCard headSlot;
-    private BodyCard bodySlot;
-    private LegCard legSlot;
 }

@@ -4,11 +4,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.frame.gameservice.dto.PlayerDTO;
+import main.frame.shared.dto.PlayerDTO;
+import main.frame.gameservice.model.LobbyPlayerCards;
 import main.frame.gameservice.model.effects.Effect;
 import main.frame.gameservice.model.Player;
+import main.frame.shared.dto.UserDTO;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -32,6 +35,36 @@ public class PlayerServiceImp implements PlayerService {
 //            return false; // Пользователь не найден
 //        }
 //    }
+
+    @Override
+    public Optional<PlayerDTO> getById(Long id) {
+        Player player = entityManager.find(Player.class, id);
+        if (player == null) {
+            throw new UsernameNotFoundException("Игрок с id: " + id + " не найден!");
+        }
+        return Optional.of(player.toPlayerDTO()); // Обернуть результат в Optional
+    }
+    @Transactional
+    public void updateLobbyPlayerCards(Long lobbyId, Long playerId, Set<BaseCard> hand, Set<BaseCard> backpack) {
+        LobbyPlayerCards lobbyPlayerCards = lobbyPlayerCardsRepository.findByLobbyIdAndPlayerId(lobbyId, playerId)
+                .orElse(new LobbyPlayerCards());
+        lobbyPlayerCards.setLobbyId(lobbyId);
+        lobbyPlayerCards.setPlayerId(playerId);
+        lobbyPlayerCards.setHand(hand);
+        lobbyPlayerCards.setBackpack(backpack);
+        lobbyPlayerCardsRepository.save(lobbyPlayerCards);
+    }
+
+    public LobbyPlayerCards getLobbyPlayerCards(Long lobbyId, Long playerId) {
+        return lobbyPlayerCardsRepository.findByLobbyIdAndPlayerId(lobbyId, playerId)
+                .orElseThrow(() -> new EntityNotFoundException("LobbyPlayerCards not found"));
+    }
+
+    @Transactional
+    public void deleteLobbyPlayerCards(Long lobbyId, Long playerId) {
+        lobbyPlayerCardsRepository.deleteByLobbyIdAndPlayerId(lobbyId, playerId);
+    }
+
 
     // Обновление данных пользователя
 //    @Transactional
@@ -116,17 +149,29 @@ public class PlayerServiceImp implements PlayerService {
 //        }
 //    }
 
+    public Player createPlayer(UserDTO userDTO) {
+        Player player = Player.builder()
+                .userId(userDTO.getId()) // Сохраняем ID пользователя
+           //     .username(userDTO.getUsername())
+          //      .level(1) // Начальный уровень
+           //     .experience(0) // Начальный опыт
+                .build();
+        entityManager.persist(player);
+        return player;
+    }
+
+
     public void applyEffect(Effect effect, Player player) {
         switch (effect.getEffectType()) {
-            case "INCREASE_DAMAGE":
-                player.setDamage(player.getDamage() + effect.getValue());
+            case INCREASE_DAMAGE:
+       //         player.setDamage(player.getDamage() + effect.getValue());
                 break;
 //            case "HEAL":
 //                player.setHealth(player.getHealth() + effect.getValue());
 //                break;
-            case "REDUCE_ARMOR":
-                player.setArmor(player.getArmor() - effect.getValue());
-                break;
+//            case "REDUCE_ARMOR":
+//                player.setArmor(player.getArmor() - effect.getValue());
+//                break;
             default:
                 throw new IllegalArgumentException("Unknown effect type: " + effect.getEffectType());
         }
@@ -144,15 +189,6 @@ public class PlayerServiceImp implements PlayerService {
 //                .collect(Collectors.toList());
 //    }
 
-
-    @Override
-    public Optional<PlayerDTO> getById(Long id) {
-        Player player = entityManager.find(Player.class, id);
-        if (player == null) {
-            throw new UsernameNotFoundException("Игрок с id: " + id + " не найден!");
-        }
-        return Optional.of(player.toPlayerDTO()); // Обернуть результат в Optional
-    }
 
 //    @Transactional
 //    public void equipArmor(Player player, ArmorCard armorCard) {

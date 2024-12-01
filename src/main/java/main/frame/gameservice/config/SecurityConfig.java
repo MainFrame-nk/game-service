@@ -24,10 +24,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)  // Отключаем CSRF для REST API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/game/**").permitAll()  // Регистрация доступна без токена
+                        .requestMatchers("/ws/**").permitAll() // Игнорируем WebSocket-эндпоинты
+                       // .requestMatchers("/game/**").permitAll()  // Регистрация доступна без токена
+                        .requestMatchers("/game/**").hasAuthority("ROLE_USER") // Пример: только пользователи могут создавать лобби
+                        .requestMatchers("/players/**").hasAuthority("ROLE_USER") // Пример: только пользователи могут создавать лобби
+                        // .requestMatchers("/lobby/create").hasAuthority("ROLE_USER") // Пример: только пользователи могут создавать лобби
                         .requestMatchers("/static/**").permitAll()
+                        //  .requestMatchers("/lobby/admin").hasAuthority("ROLE_ADMIN") // Пример: доступ только админам
                        // .anyRequest().hasAuthority("ROLE_ADMIN")
-                       // .anyRequest().authenticated()  // Все остальные запросы требуют токена
+                        .anyRequest().authenticated()  // Все остальные запросы требуют токена
                 )
                 .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
 

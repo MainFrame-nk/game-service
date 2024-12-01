@@ -5,4 +5,16 @@ eureka:
   instance:
     prefer-ip-address: true
 server:
-  port: 8082
+  port: 8084
+
+spring:
+  rabbitmq:
+    host: rabbitmq-host
+    port: 5672
+    username: guest
+    password: guest
+  application:
+    name: GameService
+
+jwt:
+  secret: U7512_nG32Eu&261hJp-aSd-KjaaDcbQ

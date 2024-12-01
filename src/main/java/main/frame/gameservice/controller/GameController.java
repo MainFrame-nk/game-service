@@ -1,7 +1,7 @@
 package main.frame.gameservice.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import main.frame.gameservice.dto.PlayerDTO;
+import main.frame.shared.dto.PlayerDTO;
 import main.frame.gameservice.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +54,7 @@ public class GameController {
         if (optionalPlayer.isPresent()) {
             return ResponseEntity.ok(optionalPlayer.get());
         } else {
-            System.out.println("User not found with" + id);
+            System.out.println("Игрок не найден, id: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
